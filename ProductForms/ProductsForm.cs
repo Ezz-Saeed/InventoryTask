@@ -25,6 +25,11 @@ namespace InventoryTask
 
         private void Form1_Load(object sender, EventArgs e)
         {
+            if (!CurrentUser.Roles.Contains("Admin"))
+            {
+                newProduct.Visible = false;
+                
+            }
             Load_Products();
         }
 
@@ -39,7 +44,7 @@ namespace InventoryTask
                 adapter.Fill(products);
                 ProductsDataGridView.DataSource = products;
 
-                if (!ProductsDataGridView.Columns.Contains("Edit"))
+                if (!ProductsDataGridView.Columns.Contains("Edit") && CurrentUser.Roles.Contains("Admin"))
                 {
                     DataGridViewButtonColumn editColumn = new DataGridViewButtonColumn();
                     editColumn.Name = "Edit";
@@ -49,7 +54,7 @@ namespace InventoryTask
                     ProductsDataGridView.Columns.Add(editColumn);
                 }
 
-                if (!ProductsDataGridView.Columns.Contains("Delete"))
+                if (!ProductsDataGridView.Columns.Contains("Delete") && CurrentUser.Roles.Contains("Admin"))
                 {
                     DataGridViewButtonColumn deletetColumn = new DataGridViewButtonColumn();
                     deletetColumn.Name = "Delete";

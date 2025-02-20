@@ -61,7 +61,7 @@ namespace InventoryTask.UserForms
                     ParameterName = "@RoleId",
                     SqlDbType = SqlDbType.VarChar,
                     Direction = ParameterDirection.Input,
-                    Value = 2
+                    Value = 1
                 };
 
                 command.Parameters.Add(userName);

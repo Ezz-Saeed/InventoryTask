@@ -44,15 +44,13 @@ namespace InventoryTask
                 using SqlDataReader reader = command.ExecuteReader();
 
                 if (reader.HasRows)
-                {
-                    string loggedInUser = string.Empty;
-                    List<string> roles = new();
+                {                 
                     byte[] passwordHash = new byte[] { };
                     byte[] passwordSalt = new byte[] { };
                     while (reader.Read())
                     {
-                        loggedInUser = reader["UserName"].ToString()!;
-                        roles.Add(reader["RoleName"].ToString()!);
+                        CurrentUser.Username = reader["UserName"].ToString()!;
+                        CurrentUser.Roles.Add(reader["RoleName"].ToString()!);
                         passwordHash = (byte[])reader["PasswordHash"];
                         passwordSalt = (byte[])reader["PasswordSalt"];
                     }
@@ -64,7 +62,7 @@ namespace InventoryTask
                         MessageBox.Show("Invalid password!", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         return;
                     }
-                    MessageBox.Show($"Login successful!\nUser: {loggedInUser}",
+                    MessageBox.Show($"Login successful!\nUser: {CurrentUser.Username}",
                         "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                     ProductsForm productsForm = new ProductsForm();
