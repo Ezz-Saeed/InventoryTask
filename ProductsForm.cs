@@ -19,6 +19,7 @@ namespace InventoryTask
         {
             settings = new Settings();
             InitializeComponent();
+            ProductsDataGridView.CellClick += ProductsDataGridView_CellClick;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -35,6 +36,16 @@ namespace InventoryTask
                 using var products = new DataTable();
                 adapter.Fill(products);
                 ProductsDataGridView.DataSource = products;
+
+                if (!ProductsDataGridView.Columns.Contains("Edit"))
+                {
+                    DataGridViewButtonColumn editColumn = new DataGridViewButtonColumn();
+                    editColumn.Name = "Edit";
+                    editColumn.Text = "Edit";
+                    editColumn.HeaderText = "Edit";
+                    editColumn.UseColumnTextForButtonValue = true;
+                    ProductsDataGridView.Columns.Add(editColumn);
+                }
             }
             catch (Exception ex)
             {
@@ -47,10 +58,24 @@ namespace InventoryTask
 
         }
 
+        private void ProductsDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && ProductsDataGridView.Columns[e.ColumnIndex].Name == "Edit")
+            {
+                int productId = Convert.ToInt32(ProductsDataGridView.Rows[e.RowIndex].Cells["ProductID"].Value);
+
+                EditProductForm editProductForm = new EditProductForm(productId);
+                editProductForm.ShowDialog();
+                Load_Products();
+            }
+        }
+
+
         private void newProduct_Click(object sender, EventArgs e)
         {
             AddProductForm addProductForm = new AddProductForm();
             addProductForm.ShowDialog();
+            Load_Products();
         }
     }
 }
