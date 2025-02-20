@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace InventoryTask
+namespace InventoryTask.Helpers
 {
     public class Settings
     {

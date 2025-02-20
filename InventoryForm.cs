@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using InventoryTask.Helpers;
 
 namespace InventoryTask
 {
@@ -84,7 +85,7 @@ namespace InventoryTask
 
         private void Register_Click(object sender, EventArgs e)
         {
-
+            
         }
     }
 }
