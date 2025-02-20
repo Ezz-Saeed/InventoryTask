@@ -29,7 +29,8 @@ namespace InventoryTask
 
         private void Load_Products()
         {
-            string query = "SELECT ProductID, ProductName, Description, StockQuantity, Price, SupplierName FROM Products";
+            string query = "SELECT ProductID, ProductName, Description, StockQuantity, Price, SupplierName " +
+                "FROM Products where IsDeleted = 0";
             try
             {
                 using var adapter = new SqlDataAdapter(query, settings.GetConnection);
@@ -45,6 +46,16 @@ namespace InventoryTask
                     editColumn.HeaderText = "Edit";
                     editColumn.UseColumnTextForButtonValue = true;
                     ProductsDataGridView.Columns.Add(editColumn);
+                }
+
+                if (!ProductsDataGridView.Columns.Contains("Delete"))
+                {
+                    DataGridViewButtonColumn deletetColumn = new DataGridViewButtonColumn();
+                    deletetColumn.Name = "Delete";
+                    deletetColumn.Text = "Delete";
+                    deletetColumn.HeaderText = "Delete";
+                    deletetColumn.UseColumnTextForButtonValue = true;
+                    ProductsDataGridView.Columns.Add(deletetColumn);
                 }
             }
             catch (Exception ex)
@@ -68,6 +79,48 @@ namespace InventoryTask
                 editProductForm.ShowDialog();
                 Load_Products();
             }
+
+            if (e.RowIndex >= 0 && ProductsDataGridView.Columns[e.ColumnIndex].Name == "Delete")
+            {
+                int productId = Convert.ToInt32(ProductsDataGridView.Rows[e.RowIndex].Cells["ProductID"].Value);
+
+                try
+                {
+                    using SqlCommand deleteCommand = new SqlCommand("DeleteProduct", settings.GetConnection);
+                    deleteCommand.CommandType = CommandType.StoredProcedure;
+                    SqlParameter id = new()
+                    {
+                        ParameterName = "@ProductId",
+                        SqlDbType = SqlDbType.Int,
+                        Direction = ParameterDirection.Input,
+                        Value = productId
+                    };
+                    deleteCommand.Parameters.Add(id);
+
+                    settings.GetConnection.Open();
+                    var rowsAffected = deleteCommand.ExecuteNonQuery();
+                    if (rowsAffected > 0)
+                    {
+                        MessageBox.Show("Product deleted successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show("Error deleting product.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    MessageBox.Show("Error: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                finally
+                {
+                    if(settings.GetConnection.State == ConnectionState.Open) 
+                        settings.GetConnection.Close();
+                }
+
+                Load_Products();
+            }
+
         }
 
 
