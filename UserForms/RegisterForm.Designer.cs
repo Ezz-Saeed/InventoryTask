@@ -61,6 +61,7 @@
             Register.TabIndex = 8;
             Register.Text = "Register";
             Register.UseVisualStyleBackColor = true;
+            Register.Click += Register_Click;
             // 
             // Password
             // 

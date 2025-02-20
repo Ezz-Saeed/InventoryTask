@@ -9,6 +9,8 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using InventoryTask.Helpers;
+using InventoryTask.UserForms;
+using System.Security.Cryptography;
 
 namespace InventoryTask
 {
@@ -35,32 +37,34 @@ namespace InventoryTask
                     SqlDbType = SqlDbType.VarChar,
                     Direction = ParameterDirection.Input,
                     Value = UserName.Text
-                };
-
-                SqlParameter password = new()
-                {
-                    ParameterName = "@Password",
-                    SqlDbType = SqlDbType.VarChar,
-                    Direction = ParameterDirection.Input,
-                    Value = Password.Text
-                };
+                };               
                 command.Parameters.Add(userName);
-                command.Parameters.Add(password);
+                //command.Parameters.Add(password);
 
                 connection.Open();
                 using SqlDataReader reader = command.ExecuteReader();
 
                 if (reader.HasRows)
                 {
-                    string loggedInUser = "";
+                    string loggedInUser = string.Empty;
                     List<string> roles = new();
-
+                    byte[] passwordHash = new byte[] { };
+                    byte[] passwordSalt = new byte[] { };
                     while (reader.Read())
                     {
                         loggedInUser = reader["UserName"].ToString()!;
                         roles.Add(reader["RoleName"].ToString()!);
+                        passwordHash = (byte[])reader["PasswordHash"];
+                        passwordSalt = (byte[])reader["PasswordSalt"];
                     }
 
+                    using var hmac = new HMACSHA512(passwordSalt);
+                    var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(Password.Text));
+                    for(int i = 0; i < computedHash.Length; i++)
+                    {
+                        if (computedHash[i] != passwordHash[i])
+                            MessageBox.Show("Invalid password!", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                     MessageBox.Show($"Login successful!\nUser: {loggedInUser}",
                         "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
@@ -85,7 +89,8 @@ namespace InventoryTask
 
         private void Register_Click(object sender, EventArgs e)
         {
-            
+            RegisterForm registerForm = new RegisterForm();
+            registerForm.ShowDialog();
         }
     }
 }
