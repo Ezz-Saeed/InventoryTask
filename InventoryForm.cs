@@ -39,7 +39,6 @@ namespace InventoryTask
                     Value = UserName.Text
                 };               
                 command.Parameters.Add(userName);
-                //command.Parameters.Add(password);
 
                 connection.Open();
                 using SqlDataReader reader = command.ExecuteReader();
@@ -60,10 +59,10 @@ namespace InventoryTask
 
                     using var hmac = new HMACSHA512(passwordSalt);
                     var computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(Password.Text));
-                    for(int i = 0; i < computedHash.Length; i++)
+                    if (!computedHash.SequenceEqual(passwordHash)) 
                     {
-                        if (computedHash[i] != passwordHash[i])
-                            MessageBox.Show("Invalid password!", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("Invalid password!", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
                     }
                     MessageBox.Show($"Login successful!\nUser: {loggedInUser}",
                         "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
