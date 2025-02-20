@@ -29,10 +29,28 @@ namespace InventoryTask
         private void Load_Products()
         {
             string query = "SELECT ProductID, ProductName, Description, StockQuantity, Price, SupplierName FROM Products";
-            var adapter = new SqlDataAdapter(query, settings.GetConnection);
-            var products = new DataTable();
-            adapter.Fill(products);
-            ProductsDataGridView.DataSource = products;
+            try
+            {
+                using var adapter = new SqlDataAdapter(query, settings.GetConnection);
+                using var products = new DataTable();
+                adapter.Fill(products);
+                ProductsDataGridView.DataSource = products;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error! ${ex.Message}");
+            }
+        }
+
+        private void ProductsDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        private void newProduct_Click(object sender, EventArgs e)
+        {
+            AddProductForm addProductForm = new AddProductForm();
+            addProductForm.ShowDialog();
         }
     }
 }
